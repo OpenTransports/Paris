@@ -16,6 +16,7 @@ import (
 // @formParam longitude : optional, the longitude around where to search, default is 0
 // @formParam radius : optional, default is 200m
 func GetTransports(ctx context.Context) {
+	ctx.Header("Access-Control-Allow-Origin", "*")
 	// Recover from potential panic in agencies
 	defer func() {
 		if r := recover(); r != nil {

@@ -13,6 +13,7 @@ import (
 // @formParam latitude : optional, the latitude around where to search, default is 0
 // @formParam longitude : optional, the longitude around where to search, default is 0
 func GetAgencies(ctx context.Context) {
+	ctx.Header("Access-Control-Allow-Origin", "*")
 	// Recover from potential panic in agencies
 	defer func() {
 		if r := recover(); r != nil {
