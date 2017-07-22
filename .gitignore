@@ -1,0 +1,12 @@
+*.test
+
+vendor/*
+!vendor/vendor.json
+
+debug
+
+Paris
+Paris.db
+
+tmp
+medias
