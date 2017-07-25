@@ -4,8 +4,8 @@
 
 Checkout the [TODO list](https://github.com/OpenTransports/Paris/projects/1) to see the roadmap.
 
-- Pick one a task
-- Open a issue so I now you're working on it
+- Pick a task
+- Open an issue so I now you're working on it
 - Make a pull request on the develop branch
 
 
