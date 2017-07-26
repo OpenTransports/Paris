@@ -133,7 +133,7 @@ func mapToTransports(gtfss []*gtfs.GTFS) []*ratpTransport {
 					AgencyID: Agency.ID,
 					Name:     s.Name,
 					Type:     g.Routes[0].Type,
-					Group:    g.Routes[0].ShortName,
+					Line:     g.Routes[0].ShortName,
 					Image:    image,
 					Position: models.Position{
 						Latitude:  s.Latitude,
@@ -161,7 +161,7 @@ func imageForRoute(r gtfs.Route) string {
 		return "ferre/indices-ferres-2017.05/T_" + r.ShortName[1:] + ".png"
 	case models.Metro:
 		return "ferre/indices-ferres-2017.05/M_" + r.ShortName + ".png"
-	case models.RER:
+	case models.Rail:
 		return "ferre/indices-ferres-2017.05/RER_" + r.ShortName + ".png"
 	case models.Bus:
 		// Handle noctiliens Noct-133-genRVB

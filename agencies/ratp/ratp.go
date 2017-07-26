@@ -23,11 +23,15 @@ var Agency = &ratpAgency{
 	models.AgencyProto{
 		ID:     "FR.Paris.RATP",
 		Name:   "RATP",
+		URL:    "https://ratp.fr",
+		Git:    "https://github.com/opentransports/paris",
 		Radius: 20000, // 20 Km
 		Center: models.Position{
 			Latitude:  48.856,
 			Longitude: 2.35,
 		},
+		Types:       []int{models.Tram, models.Metro, models.Bus, models.Rail},
+		TypesString: []string{models.TramString, models.MetroString, models.BusString, models.RailString},
 	},
 }
 
@@ -64,7 +68,7 @@ func (a *ratpAgency) TransportsNearPosition(p *models.Position, radius float64) 
 		if t.DistanceFrom(p) < radius {
 			added := false
 			for k, ft := range filteredTransports {
-				if ft.Group == t.Group {
+				if ft.Line == t.Line {
 					added = true
 					if ft.DistanceFrom(p) > t.DistanceFrom(p) {
 						filteredTransports[k] = transports[j]

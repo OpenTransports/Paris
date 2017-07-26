@@ -7,8 +7,8 @@ import (
 
 	"golang.org/x/net/html"
 
-	htmlquery "github.com/antchfx/xquery/html"
 	"github.com/OpenTransports/Paris/models"
+	htmlquery "github.com/antchfx/xquery/html"
 )
 
 // Given a Transports
@@ -25,21 +25,21 @@ func GetNextPassages(t *ratpTransport) ([]*models.Passage, error) {
 	switch t.Type {
 	case models.Tram:
 		reseau = models.TramString
-		line = fmt.Sprintf("B%s", t.Group)
+		line = fmt.Sprintf("B%s", t.Line)
 	case models.Metro:
 		reseau = "metro"
-		line = fmt.Sprintf("M%s", t.Group)
+		line = fmt.Sprintf("M%s", t.Line)
 	case models.Bus:
-		if t.Group[0] == 'N' {
+		if t.Line[0] == 'N' {
 			reseau = "noctilien"
-			line = fmt.Sprintf("B%s", t.Group)
+			line = fmt.Sprintf("B%s", t.Line)
 		} else {
 			reseau = "bus"
-			line = fmt.Sprintf("B%s", t.Group)
+			line = fmt.Sprintf("B%s", t.Line)
 		}
-	case models.RER:
+	case models.Rail:
 		reseau = "rer"
-		line = fmt.Sprintf("R%s", t.Group)
+		line = fmt.Sprintf("R%s", t.Line)
 	}
 	// Fetch html page
 	URL := fmt.Sprintf(
@@ -61,7 +61,7 @@ func GetNextPassages(t *ratpTransport) ([]*models.Passage, error) {
 	}
 	// Extract infos from html page
 	switch t.Type {
-	case models.RER:
+	case models.Rail:
 		infoA, errA = extractInfoRER(docA)
 		infoR, errR = extractInfoRER(docR)
 	case models.Bus:
