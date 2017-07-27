@@ -149,6 +149,7 @@ func mapToTransports(gtfss []*gtfs.GTFS) []*ratpTransport {
 					Type:     g.Routes[0].Type,
 					Line:     g.Routes[0].ShortName,
 					IconURL:  image,
+					Passages: []*models.Passage{},
 					Position: models.Position{
 						Latitude:  s.Latitude,
 						Longitude: s.Longitude,
