@@ -46,6 +46,10 @@ func (t *ratpTransport) UpdateInfo() error {
 	// Get next passages for the transport
 	var err error
 	t.Passages, err = GetNextPassages(t)
+	// Prevent return null instead of an empty array when transforming in json
+	if t.Passages == nil {
+		t.Passages = []*models.Passage{}
+	}
 	return err
 }
 
