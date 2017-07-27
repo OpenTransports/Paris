@@ -12,15 +12,15 @@ type IAgency interface {
 // The gives some properties and to methods
 // Each Agencies structs still need to implement TransportsNearPosition
 type AgencyProto struct {
-	ID          string   `json:"ID"`           // ID of the region (Country.City.Agency)
-	Name        string   `json:"name"`         // Displayed name of the Agency
-	URL         string   `json:"url"`          // The URL to the agency's website/app...
-	Git         string   `json:"git"`          // The URL to the git repo
-	Center      Position `json:"center"`       // Center of the Agency
-	Radius      float64  `json:"radius"`       // Radius of the Agency in meters
-	Types       []int    `json:"types"`        // The type of transports handled by the agency
-	TypesString []string `json:"types_string"` // Name for the type of transports
-	IconsURL    []string `json:"iconsURL"`     // URL to the transports types icons
+	ID          string   `json:"ID"`          // ID of the region (Country.City.Agency)
+	Name        string   `json:"name"`        // Displayed name of the Agency
+	URL         string   `json:"url"`         // The URL to the agency's website/app...
+	Git         string   `json:"git"`         // The URL to the git repo
+	Center      Position `json:"center"`      // Center of the Agency
+	Radius      float64  `json:"radius"`      // Radius of the Agency in meters
+	Types       []int    `json:"types"`       // The type of transports handled by the agency
+	TypesString []string `json:"typesString"` // Name for the type of transports
+	IconsURL    []string `json:"iconsURL"`    // URL to the transports types icons
 }
 
 // String - Stringify an agency
