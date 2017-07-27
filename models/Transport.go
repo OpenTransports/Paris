@@ -46,7 +46,6 @@ type (
 		ID       string     `json:"ID"`       // ID of the Transport, should be specific to the Agency
 		AgencyID string     `json:"agencyID"` // ID of the associated agency
 		Type     int        `json:"type"`     // String identifing the kind of transport
-		Image    string     `json:"image"`    // The image to display that represent the transport
 		Name     string     `json:"name"`     // The name of the transport, doesn't have to be unique
 		Line     string     `json:"line"`     // The line of the transport
 		Position Position   `json:"position"` // Position of the transport
