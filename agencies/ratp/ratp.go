@@ -32,6 +32,12 @@ var Agency = &ratpAgency{
 		},
 		Types:       []int{models.Tram, models.Metro, models.Bus, models.Rail},
 		TypesString: []string{models.TramString, models.MetroString, models.BusString, models.RailString},
+		IconsURL: []string{
+			helpers.ServerURL + "/medias/ferre/indices-ferres-2017.05/L_T",
+			helpers.ServerURL + "/medias/ferre/indices-ferres-2017.05/L_M",
+			helpers.ServerURL + "/medias/logoRER.png",
+			helpers.ServerURL + "/medias/logoBus.svg",
+		},
 	},
 }
 

@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"os"
 	"path"
 
 	"github.com/boltdb/bolt"
@@ -75,5 +76,8 @@ func TmpDir(agencyID string) string {
 // @param agencyID, the ID of the agency
 // @return the media folder for the given agency ID
 func MediaDir(agencyID string) string {
-	return path.Join("medias", agencyID)
+	return "medias"
 }
+
+// ServerURL - URL of the server
+var ServerURL = os.Getenv("SERVER_URL")

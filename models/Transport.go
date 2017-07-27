@@ -51,6 +51,7 @@ type (
 		Line     string     `json:"line"`     // The line of the transport
 		Position Position   `json:"position"` // Position of the transport
 		Passages []*Passage `json:"passages"` // Next passage for public transports
+		IconURL  string     `json:"iconURL"`  // URL to the icon
 	}
 )
 

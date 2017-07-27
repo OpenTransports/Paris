@@ -20,6 +20,7 @@ type AgencyProto struct {
 	Radius      float64  `json:"radius"`       // Radius of the Agency in meters
 	Types       []int    `json:"types"`        // The type of transports handled by the agency
 	TypesString []string `json:"types_string"` // Name for the type of transports
+	IconsURL    []string `json:"iconsURL"`     // URL to the transports types icons
 }
 
 // String - Stringify an agency

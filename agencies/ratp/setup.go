@@ -18,6 +18,8 @@ import (
 const gtfsURL = "http://dataratp.download.opendatasoft.com/RATP_GTFS_LINES.zip"
 const iconFerreURL = "https://data.ratp.fr/api/datasets/1.0/indices-et-couleurs-de-lignes-du-reseau-ferre-ratp/attachments/indices_ferres_2017_05_zip.zip"
 const iconBusURL = "http://data.ratp.fr/api/datasets/1.0/indices-des-lignes-de-bus-du-reseau-ratp/attachments/indices_zip.zip"
+const iconLogoBusURL = "https://upload.wikimedia.org/wikipedia/commons/4/49/Paris_logo_bus_jms.svg"
+const iconLogoRERURL = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Paris_RER_icon.svg/50px-Paris_RER_icon.svg.png"
 
 var tmp = helpers.TmpDir(Agency.ID)
 var media = helpers.MediaDir(Agency.ID)
@@ -34,8 +36,10 @@ func init() {
 		download(gtfsURL, tmp)
 		unzip()
 		store()
-		download(iconFerreURL, path.Join(media, "ferre"))
-		download(iconBusURL, path.Join(media, "bus"))
+		go download(iconFerreURL, path.Join(media, "ferre"))
+		go download(iconBusURL, path.Join(media, "bus"))
+		go downloadFile(iconLogoRERURL, path.Join(media, "logoRER.png"))
+		go downloadFile(iconLogoBusURL, path.Join(media, "logoBus.svg"))
 	}
 }
 
@@ -47,6 +51,16 @@ func download(URL string, path string) {
 	if os.IsNotExist(err) {
 		fmt.Println("Downloading in " + path + "...")
 		err = getter.Get(path, URL)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+func downloadFile(URL string, path string) {
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		fmt.Println("Downloading in " + path + "...")
+		err = getter.GetFile(path, URL)
 		if err != nil {
 			panic(err)
 		}
@@ -156,20 +170,21 @@ func imageForRoute(r gtfs.Route) string {
 			panic(err)
 		}
 		if num >= 5 {
-			return "ferre/indices-ferres-2017.05/t_" + r.ShortName[1:] + ".png"
+			return helpers.ServerURL + "/medias/ferre/indices-ferres-2017.05/t_" + r.ShortName[1:] + ".png"
 		}
-		return "ferre/indices-ferres-2017.05/T_" + r.ShortName[1:] + ".png"
+		return helpers.ServerURL + "/medias/ferre/indices-ferres-2017.05/T_" + r.ShortName[1:] + ".png"
 	case models.Metro:
-		return "ferre/indices-ferres-2017.05/M_" + r.ShortName + ".png"
+		return helpers.ServerURL + "/medias/ferre/indices-ferres-2017.05/M_" + r.ShortName + ".png"
 	case models.Rail:
-		return "ferre/indices-ferres-2017.05/RER_" + r.ShortName + ".png"
+		return helpers.ServerURL + "/medias/ferre/indices-ferres-2017.05/RER_" + r.ShortName + ".png"
 	case models.Bus:
 		// Handle noctiliens Noct-133-genRVB
 		if string(r.ShortName[0]) == "N" {
-			return "bus/indices/Noct-" + r.ShortName[1:] + "-genRVB.png"
+			return helpers.ServerURL + "/medias/bus/indices/Noct-" + r.ShortName[1:] + "-genRVB.png"
 		}
-		return "bus/indices/" + r.ShortName + "genRVB.png"
+		return helpers.ServerURL + "/medias/bus/indices/" + r.ShortName + "genRVB.png"
 	default:
-		return "error.png"
+		return ""
 	}
+
 }
