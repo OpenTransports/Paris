@@ -1,7 +1,6 @@
 package ratp
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -28,19 +27,13 @@ func init() {
 	if flag.Lookup("test.v") != nil {
 		return
 	}
-	gtfsExist, err := helpers.CheckTransportsExists(Agency.ID)
-	if err != nil {
-		panic(err)
-	}
-	if !gtfsExist {
-		download(gtfsURL, tmp)
-		unzip()
-		store()
-		go download(iconFerreURL, path.Join(media, "ferre"))
-		go download(iconBusURL, path.Join(media, "bus"))
-		go downloadFile(iconLogoRERURL, path.Join(media, "logoRER.png"))
-		go downloadFile(iconLogoBusURL, path.Join(media, "logoBus.svg"))
-	}
+	download(gtfsURL, tmp)
+	unzip()
+	store()
+	go download(iconFerreURL, path.Join(media, "ferre"))
+	go download(iconBusURL, path.Join(media, "bus"))
+	go downloadFile(iconLogoRERURL, path.Join(media, "logoRER.png"))
+	go downloadFile(iconLogoBusURL, path.Join(media, "logoBus.svg"))
 }
 
 // Download an file into the given path
@@ -99,18 +92,7 @@ func store() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Marshalling RATP...")
-	transports := mapToTransports(gtfss)
-	// Store the data in the db
-	buffer, err := json.Marshal(transports)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Storing RATP...")
-	err = helpers.StoreTransports(Agency.ID, buffer)
-	if err != nil {
-		panic(err)
-	}
+	Transports = mapToTransports(gtfss)
 }
 
 // Remove Downloaded sruff
@@ -123,14 +105,14 @@ func clean() {
 }
 
 // TODO - Group Transport with the same Position
-func mapToTransports(gtfss []*gtfs.GTFS) []*ratpTransport {
+func mapToTransports(gtfss []*gtfs.GTFS) []ratpTransport {
 	// Total count of transports
 	var size int
 	for _, g := range gtfss {
 		size += len(g.Stops)
 	}
 	// Create the transports array
-	transports := make([]*ratpTransport, size)
+	transports := make([]ratpTransport, size)
 	// For each gtfs, map the stops to a ratpTransport struct
 	// and add them to the transports array
 	// Also update the image path of each transport depending on its Routes
@@ -141,7 +123,7 @@ func mapToTransports(gtfss []*gtfs.GTFS) []*ratpTransport {
 		}
 		image := imageForRoute(g.Routes[0])
 		for _, s := range g.Stops {
-			transports[i] = &ratpTransport{
+			transports[i] = ratpTransport{
 				models.TransportProto{
 					ID:       s.ID,
 					AgencyID: Agency.ID,
