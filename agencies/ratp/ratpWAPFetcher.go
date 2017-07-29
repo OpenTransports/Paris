@@ -30,7 +30,7 @@ func GetNextPassages(t *ratpTransport) (passages []*models.Passage, err error) {
 	var reseau, line string
 	switch t.Type {
 	case models.Tram:
-		reseau = models.TramString
+		reseau = "tram"
 		line = fmt.Sprintf("B%s", t.Line)
 	case models.Metro:
 		reseau = "metro"
