@@ -69,42 +69,48 @@ func GetTransports(ctx context.Context) {
 
 // Refresh information concerning transports
 // @params transports : the transports list to update
-func updateInfos(transports []models.ITransport) (err []error) {
+func updateInfos(transports []models.ITransport) []error {
 	if len(transports) == 0 {
 		return nil
 	}
 	// Create a chanel
 	errors := make(chan error, len(transports))
 	gather := make(chan bool, len(transports))
+
 	// For each transports, concurencialy update infos
 	for _, t := range transports {
+
 		go func(tran models.ITransport) {
-			err := make(chan error, 1)
-			done := make(chan bool, 1)
+
+			errC := make(chan error, 1)
+			doneC := make(chan bool, 1)
+
 			go func() {
 				// Recover from potential panic in agencies
 				defer func() {
 					if r := recover(); r != nil {
-						err <- fmt.Errorf("Panic updating transport (%v) infos\n	==> %v", tran, r)
+						errC <- fmt.Errorf("Panic updating transport\n	==> %v\n	==> station: (%v)", r, tran)
 					}
 				}()
 				err := tran.UpdateInfo()
 				if err != nil {
-					errors <- err
+					panic(err)
 				} else {
-					done <- true
+					doneC <- true
 				}
 			}()
 
 			select {
-			case d := <-done:
-				gather <- d
-			case e := <-err:
-				errors <- e
+			case done := <-doneC:
+				gather <- done
+			case err := <-errC:
+				errors <- err
 			case <-time.After(3 * time.Second):
-				errors <- fmt.Errorf("Time out after 3s on %v", tran)
+				errors <- fmt.Errorf("Time out after 3s\n	==> station: %v", tran)
 			}
+
 		}(t)
+
 	}
 	// Wait for each update to finish
 	i := 0
@@ -113,8 +119,8 @@ func updateInfos(transports []models.ITransport) (err []error) {
 		select {
 		case <-gather:
 			continue
-		case e := <-errors:
-			errs = append(errs, e)
+		case err := <-errors:
+			errs = append(errs, err)
 		}
 		i++
 		if i == len(transports) {

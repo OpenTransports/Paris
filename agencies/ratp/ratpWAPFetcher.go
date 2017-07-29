@@ -17,7 +17,13 @@ import (
 // 3 - Build []*models.Passage from the extracted info
 
 // GetNextPassages -
-func GetNextPassages(t *ratpTransport) ([]*models.Passage, error) {
+func GetNextPassages(t *ratpTransport) (passages []*models.Passage, err error) {
+	var URL string
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("%v\n	==> URL: %v", r, URL)
+		}
+	}()
 	var infoA, infoR []*models.Passage
 	var errA, errR error
 	// Build reseau and line depending on the kind of transport
@@ -42,7 +48,7 @@ func GetNextPassages(t *ratpTransport) ([]*models.Passage, error) {
 		line = fmt.Sprintf("R%s", t.Line)
 	}
 	// Fetch html page
-	URL := fmt.Sprintf(
+	URL = fmt.Sprintf(
 		"http://wap.ratp.fr/siv/schedule?reseau=%v&lineid=%v&stationname=%v&directionsens=",
 		url.QueryEscape(reseau),
 		url.QueryEscape(line),
@@ -50,13 +56,13 @@ func GetNextPassages(t *ratpTransport) ([]*models.Passage, error) {
 	)
 	docA, err := htmlquery.LoadURL(URL + "A")
 	if err != nil {
-		return nil, fmt.Errorf("Error updating transport: <%v> at url %v\n	==> %v", t, URL+"A", err)
+		return nil, fmt.Errorf("Error updating transport\n	==> %v\n	==> station %v\n	==> URL: %v", err, t, URL+"A")
 	}
 	var docR *html.Node
 	if t.Type != models.Bus {
 		docR, err = htmlquery.LoadURL(URL + "R")
 		if err != nil {
-			return nil, fmt.Errorf("Error updating transport: <%v> at url %v\n	==> %v", t, URL+"R", err)
+			return nil, fmt.Errorf("Error updating transport\n	==> %v\n	==> station %v\n	==> URL: %v", err, t, URL+"R")
 		}
 	}
 	// Extract infos from html page
@@ -71,10 +77,10 @@ func GetNextPassages(t *ratpTransport) ([]*models.Passage, error) {
 		infoR, errR = extractInfo(docR)
 	}
 	if errA != nil {
-		return nil, fmt.Errorf("Error updating transport: <%v> at url %v\n	==> %v", t, URL+"A", errA)
+		return nil, fmt.Errorf("Error updating transport\n	==> %v\n	==> station %v\n	==> URL: %v", errA, t, URL+"A")
 	}
 	if errR != nil {
-		return nil, fmt.Errorf("Error updating transport: <%v> at url %v\n	==> %v", t, URL+"R", errR)
+		return nil, fmt.Errorf("Error updating transport\n	==> %v\n	==> station %v\n	==> URL: %v", errR, t, URL+"R")
 	}
 	return append(infoA, infoR...), nil
 }
