@@ -61,24 +61,11 @@ func (a *ratpAgency) TransportsNearPosition(p *models.Position, radius float64) 
 	// Init array of filtered transports
 	filteredTransports := make([]ratpTransport, 0, 200)
 	// Loop trough agencies transports to find the one that are in the radius limits
-	// Only return ONE Transport by line (the closest)
 	i := 0
 	for j, t := range Transports {
 		if t.DistanceFrom(p) < radius {
-			added := false
-			for k, ft := range filteredTransports {
-				if ft.Line == t.Line {
-					added = true
-					if ft.DistanceFrom(p) > t.DistanceFrom(p) {
-						filteredTransports[k] = Transports[j]
-						break
-					}
-				}
-			}
-			if !added {
-				filteredTransports = append(filteredTransports, Transports[j])
-				i++
-			}
+			filteredTransports = append(filteredTransports, Transports[j])
+			i++
 		}
 	}
 
