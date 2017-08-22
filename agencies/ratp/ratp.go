@@ -2,6 +2,8 @@
 package ratp
 
 import (
+	"time"
+
 	"github.com/OpenTransports/Paris/helpers"
 	"github.com/OpenTransports/lib-go/models"
 )
@@ -37,13 +39,13 @@ var Agency = models.Agency{
 }
 
 // UpdateTransportInfo for RATP Transport struct
-func UpdateTransportInfo(transport models.Transport) error {
+func UpdateTransportInfo(transport *models.Transport) error {
 	// Get next passages for the transport
 	var err error
-	transport.Informations, err = GetNextPassages(transport)
+	transport.Informations, err = GetNextPassages(*transport)
 	// Prevent return null instead of an empty array when transforming in json
-	if transport.Informations == nil {
-		transport.Informations = []models.Information{}
+	for i := range transport.Informations {
+		transport.Informations[i].Timestamp = int(time.Now().Unix()) * 1000
 	}
 	return err
 }

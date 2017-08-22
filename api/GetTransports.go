@@ -79,10 +79,9 @@ func updateInfos(transports []models.Transport) []error {
 	gather := make(chan bool, len(transports))
 
 	// For each transports, concurencialy update infos
-	for _, t := range transports {
+	for i := range transports {
 
-		go func(tran models.Transport) {
-
+		go func(i int) {
 			errC := make(chan error, 1)
 			doneC := make(chan bool, 1)
 
@@ -90,10 +89,10 @@ func updateInfos(transports []models.Transport) []error {
 				// Recover from potential panic in agencies
 				defer func() {
 					if r := recover(); r != nil {
-						errC <- fmt.Errorf("Panic updating transport\n	==> %v\n	==> station: (%v)", r, tran)
+						errC <- fmt.Errorf("Panic updating transport\n	==> %v\n	==> station: (%v)", r, transports[i])
 					}
 				}()
-				err := ratp.UpdateTransportInfo(tran)
+				err := ratp.UpdateTransportInfo(&transports[i])
 				if err != nil {
 					panic(err)
 				} else {
@@ -106,11 +105,11 @@ func updateInfos(transports []models.Transport) []error {
 				gather <- done
 			case err := <-errC:
 				errors <- err
-			case <-time.After(3 * time.Second):
-				errors <- fmt.Errorf("Time out after 3s\n	==> station: %v", tran)
+			case <-time.After(7 * time.Second):
+				errors <- fmt.Errorf("Time out after 3s\n	==> station: %v", transports[i])
 			}
 
-		}(t)
+		}(i)
 
 	}
 	// Wait for each update to finish

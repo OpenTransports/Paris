@@ -92,7 +92,7 @@ func store() {
 	if err != nil {
 		panic(err)
 	}
-	Transports = mapToTransports(gtfss)
+	Transports = filterDouble(mapToTransports(gtfss))
 }
 
 // Remove Downloaded sruff
@@ -104,7 +104,26 @@ func clean() {
 	}
 }
 
-// TODO - Group Transport with the same Position
+func filterDouble(transports []models.Transport) []models.Transport {
+	filteredTransports := make([]models.Transport, 0, len(transports))
+	count := 0
+	for i, tran1 := range transports {
+		added := false
+		for _, tran2 := range filteredTransports {
+			if tran1.Line == tran2.Line && tran1.Name == tran2.Name {
+				added = true
+				break
+			}
+		}
+		if !added {
+			filteredTransports = append(filteredTransports, transports[i])
+			count++
+		}
+	}
+
+	return filteredTransports[:count]
+}
+
 func mapToTransports(gtfss []*gtfs.GTFS) []models.Transport {
 	// Total count of transports
 	var size int
