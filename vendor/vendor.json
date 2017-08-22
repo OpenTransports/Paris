@@ -17,10 +17,10 @@
 			"revisionTime": "2017-06-23T13:13:27Z"
 		},
 		{
-			"checksumSHA1": "fLESBVGIIZgva9Xusra1XdM0uWo=",
+			"checksumSHA1": "lWQEu9jO5nfsINCxajg8UMF0Qik=",
 			"path": "github.com/OpenTransports/lib-go/models",
-			"revision": "b6d4c517a7e6c02aa74142afc982e7e659d7576a",
-			"revisionTime": "2017-08-18T18:30:06Z"
+			"revision": "3a01ce504488bb2ba7f7b2c8fafdef99af8c14a4",
+			"revisionTime": "2017-08-22T12:13:07Z"
 		},
 		{
 			"checksumSHA1": "NWDr7YtsMdPRQ4WMD8xK+if+Z3w=",
@@ -35,16 +35,16 @@
 			"revisionTime": "2017-06-14T09:12:19Z"
 		},
 		{
-			"checksumSHA1": "zir572KJqhJyAx48fP797rBs9J8=",
+			"checksumSHA1": "ib516kABGjjEQQF0Ltn90ADQfa0=",
 			"path": "github.com/artonge/go-csv-tag",
-			"revision": "6f72d410b401919d3651e50c79349372467f9124",
-			"revisionTime": "2017-07-09T11:24:12Z"
+			"revision": "9ae5bda928587ca4213cb3fd41b8e966ee89366e",
+			"revisionTime": "2017-08-02T15:29:55Z"
 		},
 		{
-			"checksumSHA1": "JbVPNRZfBVIk+G9n2etw/nu8BQE=",
+			"checksumSHA1": "CVtSc1qu7I8dKvUTj7F2mWUDPKI=",
 			"path": "github.com/artonge/go-gtfs",
-			"revision": "90bb8945f8b7b831508239030d02593600775262",
-			"revisionTime": "2017-07-09T16:42:29Z"
+			"revision": "fba451916cb6386490edbb0349e444b4a4264db3",
+			"revisionTime": "2017-08-02T15:59:47Z"
 		},
 		{
 			"checksumSHA1": "qF+sUUJWwYt+7ogEpPrbk5BTZzU=",

@@ -21,17 +21,17 @@ var Agency = models.Agency{
 		Latitude:  48.856,
 		Longitude: 2.35,
 	},
-	Types: map[int]models.TransportTypeInfo{
-		models.Tram: models.TransportTypeInfo{
+	Types: map[int]models.TypeInfo{
+		models.Tram: models.TypeInfo{
 			Icon: helpers.ServerURL + "/medias/ferre/indices-ferres-2017.05/L_T.png",
 		},
-		models.Metro: models.TransportTypeInfo{
+		models.Metro: models.TypeInfo{
 			Icon: helpers.ServerURL + "/medias/ferre/indices-ferres-2017.05/L_M.png",
 		},
-		models.Bus: models.TransportTypeInfo{
+		models.Bus: models.TypeInfo{
 			Icon: helpers.ServerURL + "/medias/logoBus.svg",
 		},
-		models.Rail: models.TransportTypeInfo{
+		models.Rail: models.TypeInfo{
 			Name: "RER",
 			Icon: helpers.ServerURL + "/medias/logoRER.png",
 		},
