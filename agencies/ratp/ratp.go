@@ -3,52 +3,47 @@ package ratp
 
 import (
 	"github.com/OpenTransports/Paris/helpers"
-	"github.com/OpenTransports/Paris/models"
+	"github.com/OpenTransports/lib-go/models"
 )
 
-type (
-	ratpAgency struct {
-		models.AgencyProto
-	}
-
-	ratpTransport struct {
-		models.TransportProto
-	}
-)
-
-var Transports []ratpTransport
+// Transports - List of all transports of the RATP agency
+var Transports []models.Transport
 
 // Agency - Agency object
-var Agency = &ratpAgency{
-	models.AgencyProto{
-		ID:     "FR.Paris.RATP",
-		Name:   "RATP",
-		URL:    "https://ratp.fr",
-		Git:    "https://github.com/opentransports/paris",
-		Radius: 20000, // 20 Km
-		Center: models.Position{
-			Latitude:  48.856,
-			Longitude: 2.35,
+var Agency = models.Agency{
+	ID:     "FR.Paris.RATP",
+	Name:   "RATP",
+	URL:    "https://ratp.fr",
+	Radius: 20000, // 20 Km
+	Center: models.Position{
+		Latitude:  48.856,
+		Longitude: 2.35,
+	},
+	Types: map[int]models.TransportTypeInfo{
+		models.Tram: models.TransportTypeInfo{
+			Icon: helpers.ServerURL + "/medias/ferre/indices-ferres-2017.05/L_T.png",
 		},
-		Types:       []int{models.Tram, models.Metro, models.Bus, models.Rail},
-		TypesString: []string{models.TramString, models.MetroString, models.BusString, models.RailString},
-		IconsURL: []string{
-			helpers.ServerURL + "/medias/ferre/indices-ferres-2017.05/L_T",
-			helpers.ServerURL + "/medias/ferre/indices-ferres-2017.05/L_M",
-			helpers.ServerURL + "/medias/logoRER.png",
-			helpers.ServerURL + "/medias/logoBus.svg",
+		models.Metro: models.TransportTypeInfo{
+			Icon: helpers.ServerURL + "/medias/ferre/indices-ferres-2017.05/L_M.png",
+		},
+		models.Bus: models.TransportTypeInfo{
+			Icon: helpers.ServerURL + "/medias/logoBus.svg",
+		},
+		models.Rail: models.TransportTypeInfo{
+			Name: "RER",
+			Icon: helpers.ServerURL + "/medias/logoRER.png",
 		},
 	},
 }
 
-// UpdateInfo for RATP Transport struct
-func (t *ratpTransport) UpdateInfo() error {
+// UpdateTransportInfo for RATP Transport struct
+func UpdateTransportInfo(transport models.Transport) error {
 	// Get next passages for the transport
 	var err error
-	t.Passages, err = GetNextPassages(t)
+	transport.Informations, err = GetNextPassages(transport)
 	// Prevent return null instead of an empty array when transforming in json
-	if t.Passages == nil {
-		t.Passages = []*models.Passage{}
+	if transport.Informations == nil {
+		transport.Informations = []models.Information{}
 	}
 	return err
 }
@@ -57,23 +52,18 @@ func (t *ratpTransport) UpdateInfo() error {
 // @param p: the center of the circle
 // @param radius: the radius of the circle in meters
 // @return the transports list
-func (a *ratpAgency) TransportsNearPosition(p *models.Position, radius float64) ([]models.ITransport, error) {
+func TransportsNearPosition(position models.Position, radius float64) ([]models.Transport, error) {
 	// Init array of filtered transports
-	filteredTransports := make([]ratpTransport, 0, 200)
+	filteredTransports := make([]models.Transport, 0, 200)
 	// Loop trough agencies transports to find the one that are in the radius limits
 	i := 0
 	for j, t := range Transports {
-		if t.DistanceFrom(p) < radius {
+		if t.DistanceFrom(position) < radius {
 			filteredTransports = append(filteredTransports, Transports[j])
 			i++
 		}
 	}
-
-	abstractedTransports := make([]models.ITransport, 0, i)
-	for j := range filteredTransports {
-		abstractedTransports = append(abstractedTransports, &filteredTransports[j])
-	}
 	// Return the transport slice from 0 to i
 	// Indexes after i are just empty spots in the original array
-	return abstractedTransports[:i], nil
+	return filteredTransports[:i], nil
 }

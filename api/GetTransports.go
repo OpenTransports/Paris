@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"github.com/OpenTransports/Paris/agencies"
-	"github.com/OpenTransports/Paris/models"
+	"github.com/OpenTransports/Paris/agencies/ratp"
+	"github.com/OpenTransports/lib-go/models"
 	"github.com/go-siris/siris/context"
 )
 
@@ -21,7 +22,7 @@ func GetTransports(ctx context.Context) {
 	defer func() {
 		if r := recover(); r != nil {
 			ctx.Application().Log("Panic asking for nearest transports to agencies\n	==> %v", r)
-			_, err := ctx.JSON(make([]models.ITransport, 0))
+			_, err := ctx.JSON(make([]models.Transport, 0))
 			if err != nil {
 				ctx.Application().Log("Error writting answer in /api/transports\n	==> %v", err)
 			}
@@ -34,7 +35,7 @@ func GetTransports(ctx context.Context) {
 	longitude, _ := strconv.ParseFloat(ctx.FormValue("longitude"), 64)
 	radius, _ := strconv.ParseFloat(ctx.FormValue("radius"), 64)
 	// Create a Position object
-	position := &models.Position{
+	position := models.Position{
 		Latitude:  latitude,
 		Longitude: longitude,
 	}
@@ -43,11 +44,11 @@ func GetTransports(ctx context.Context) {
 		radius = 200.0
 	}
 	// Create transports array - max size is 300
-	nearestTransports := []models.ITransport{}
+	nearestTransports := []models.Transport{}
 	// Get all transports near the passed position
 	// Only aske agencies that cover the passed position
-	for _, a := range agencies.Containing(position) {
-		transports, err := a.TransportsNearPosition(position, radius)
+	for _ = range agencies.Containing(position) {
+		transports, err := ratp.TransportsNearPosition(position, radius)
 		if err != nil {
 			ctx.Application().Log("Error in /api/transports\n	==> %v", err)
 			continue
@@ -69,7 +70,7 @@ func GetTransports(ctx context.Context) {
 
 // Refresh information concerning transports
 // @params transports : the transports list to update
-func updateInfos(transports []models.ITransport) []error {
+func updateInfos(transports []models.Transport) []error {
 	if len(transports) == 0 {
 		return nil
 	}
@@ -80,7 +81,7 @@ func updateInfos(transports []models.ITransport) []error {
 	// For each transports, concurencialy update infos
 	for _, t := range transports {
 
-		go func(tran models.ITransport) {
+		go func(tran models.Transport) {
 
 			errC := make(chan error, 1)
 			doneC := make(chan bool, 1)
@@ -92,7 +93,7 @@ func updateInfos(transports []models.ITransport) []error {
 						errC <- fmt.Errorf("Panic updating transport\n	==> %v\n	==> station: (%v)", r, tran)
 					}
 				}()
-				err := tran.UpdateInfo()
+				err := ratp.UpdateTransportInfo(tran)
 				if err != nil {
 					panic(err)
 				} else {

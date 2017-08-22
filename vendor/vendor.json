@@ -17,6 +17,12 @@
 			"revisionTime": "2017-06-23T13:13:27Z"
 		},
 		{
+			"checksumSHA1": "fLESBVGIIZgva9Xusra1XdM0uWo=",
+			"path": "github.com/OpenTransports/lib-go/models",
+			"revision": "b6d4c517a7e6c02aa74142afc982e7e659d7576a",
+			"revisionTime": "2017-08-18T18:30:06Z"
+		},
+		{
 			"checksumSHA1": "NWDr7YtsMdPRQ4WMD8xK+if+Z3w=",
 			"path": "github.com/antchfx/xpath",
 			"revision": "c0722de2577505063ea5d05ce4f1b3091abec70b",

@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/OpenTransports/Paris/agencies"
-	"github.com/OpenTransports/Paris/models"
+	"github.com/OpenTransports/lib-go/models"
 	"github.com/go-siris/siris/context"
 )
 
@@ -23,7 +23,7 @@ func GetAgencies(ctx context.Context) {
 				ctx.FormValue("longitude"),
 				r,
 			)
-			_, err := ctx.JSON(make([]models.ITransport, 0))
+			_, err := ctx.JSON(make([]models.Transport, 0))
 			if err != nil {
 				ctx.Application().Log("Error writting answer in /api/agencies\n	==> %v", err)
 			}
@@ -35,7 +35,7 @@ func GetAgencies(ctx context.Context) {
 	latitude, _ := strconv.ParseFloat(ctx.FormValue("latitude"), 64)
 	longitude, _ := strconv.ParseFloat(ctx.FormValue("longitude"), 64)
 	// Return agencies that covers the position
-	_, err := ctx.JSON(agencies.Containing(&models.Position{
+	_, err := ctx.JSON(agencies.Containing(models.Position{
 		Latitude:  latitude,
 		Longitude: longitude,
 	}))

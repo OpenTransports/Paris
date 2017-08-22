@@ -2,25 +2,25 @@ package agencies
 
 import (
 	"github.com/OpenTransports/Paris/agencies/ratp"
-	"github.com/OpenTransports/Paris/models"
+	"github.com/OpenTransports/lib-go/models"
 )
 
 // REGIONS - List of all regions
-var agenciesList = [1]models.IAgency{
+var agenciesList = [1]models.Agency{
 	ratp.Agency,
 }
 
 // Containing -
-func Containing(p *models.Position) []models.IAgency {
+func Containing(position models.Position) []models.Agency {
 
-	if p.Latitude == 0 || p.Longitude == 0 {
+	if position.Latitude == 0 || position.Longitude == 0 {
 		return agenciesList[:]
 	}
 
-	var filter = make([]models.IAgency, 0)
+	var filter = make([]models.Agency, 0)
 
 	for _, a := range agenciesList {
-		if a.ContainsPosition(p) {
+		if a.ContainsPosition(position) {
 			filter = append(filter, a)
 		}
 	}

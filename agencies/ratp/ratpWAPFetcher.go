@@ -7,24 +7,24 @@ import (
 
 	"golang.org/x/net/html"
 
-	"github.com/OpenTransports/Paris/models"
+	"github.com/OpenTransports/lib-go/models"
 	htmlquery "github.com/antchfx/xquery/html"
 )
 
 // Given a Transports
 // 1 - Fetch the corresponding wap.ratp.fr page
 // 2 - Extract informations (done with the wquery package)
-// 3 - Build []*models.Passage from the extracted info
+// 3 - Build []models.Information from the extracted info
 
 // GetNextPassages -
-func GetNextPassages(t *ratpTransport) (passages []*models.Passage, err error) {
+func GetNextPassages(t models.Transport) (informations []models.Information, err error) {
 	var URL string
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("%v\n	==> URL: %v", r, URL)
 		}
 	}()
-	var infoA, infoR []*models.Passage
+	var infoA, infoR []models.Information
 	var errA, errR error
 	// Build reseau and line depending on the kind of transport
 	var reseau, line string
@@ -85,7 +85,7 @@ func GetNextPassages(t *ratpTransport) (passages []*models.Passage, err error) {
 	return append(infoA, infoR...), nil
 }
 
-func extractInfoNoct(doc *html.Node) ([]*models.Passage, error) {
+func extractInfoNoct(doc *html.Node) ([]models.Information, error) {
 	// Extract html nodes
 	directionsNodes := htmlquery.Find(doc, "html/body/div[@class='subtitle' and starts-with(text(), 'Direction')]/b/text()")
 	timesNodes := htmlquery.Find(doc, "html/body/div[starts-with(@class, 'bg') and count(*)=1]/b/child::text()")
@@ -102,7 +102,7 @@ func extractInfoNoct(doc *html.Node) ([]*models.Passage, error) {
 	return mergeDirTime(directions, times)
 }
 
-func extractInfo(doc *html.Node) ([]*models.Passage, error) {
+func extractInfo(doc *html.Node) ([]models.Information, error) {
 	// Extract html nodes
 	directionsNodes := htmlquery.Find(doc, "html/body/div[starts-with(@class, 'bg') and count(*) = 0]/text()")[1:]
 	timesNodes := htmlquery.Find(doc, "html/body/div[starts-with(@class, 'schmsg')]/b/child::text()")
@@ -118,7 +118,7 @@ func extractInfo(doc *html.Node) ([]*models.Passage, error) {
 	return mergeDirTime(directions, times)
 }
 
-func extractInfoRER(doc *html.Node) ([]*models.Passage, error) {
+func extractInfoRER(doc *html.Node) ([]models.Information, error) {
 	// Extract html nodes
 	directionsNodes := htmlquery.Find(doc, "html/body/div[starts-with(@class, 'bg')]/child::text()")[1:]
 	trainsNamesNodes := htmlquery.Find(doc, "html/body/div[starts-with(@class, 'schmsg')]/a/child::text()")
@@ -146,17 +146,17 @@ func extractInfoRER(doc *html.Node) ([]*models.Passage, error) {
 	return mergeDirTime(directions, times)
 }
 
-func mergeDirTime(directions []string, times []string) ([]*models.Passage, error) {
+func mergeDirTime(directions []string, times []string) ([]models.Information, error) {
 	// Directions and times must be of the same length
 	if len(directions) != len(times) {
-		fmt.Println("Weird stuff")
+		fmt.Println("Incompatible structures length")
 		for _, d := range directions {
 			fmt.Println(d)
 		}
 		for _, t := range times {
 			fmt.Println(t)
 		}
-		return nil, fmt.Errorf("Weird stuff")
+		return nil, fmt.Errorf("Incompatible structures length")
 	}
 	// Associate each direction with some times
 	// [ dir1   : [ time1
@@ -165,28 +165,27 @@ func mergeDirTime(directions []string, times []string) ([]*models.Passage, error
 	// -----------
 	// [ dir1 : [time1, time3]
 	//   dir2 : [time2] ]
-	passages := []*models.Passage{}
+	informations := []models.Information{}
 	for i, dir := range directions {
 		// Check if a passage for the dir allready exist
 		// If it exist, store the time in it
-		storred := false
-		for _, p := range passages {
-			if p.Direction == dir {
-				p.Times = append(p.Times, times[i])
-				storred = true
+		added := false
+		for j, info := range informations {
+			if info.Title == dir {
+				informations[j].Content = append(info.Content, times[i])
+				added = true
 				break
 			}
 		}
 		// And continue to the next time
-		if storred {
+		if added {
 			continue
 		}
 		// Else create a new passage inited with the dir and time
-		p := &models.Passage{
-			Direction: dir,
-			Times:     []string{times[i]},
-		}
-		passages = append(passages, p)
+		informations = append(informations, models.Information{
+			Title:   dir,
+			Content: []string{times[i]},
+		})
 	}
-	return passages, nil
+	return informations, nil
 }

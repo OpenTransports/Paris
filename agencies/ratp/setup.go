@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	"github.com/OpenTransports/Paris/helpers"
-	"github.com/OpenTransports/Paris/models"
+	"github.com/OpenTransports/lib-go/models"
 	"github.com/artonge/go-gtfs"
 	"github.com/hashicorp/go-getter"
 )
@@ -105,15 +105,15 @@ func clean() {
 }
 
 // TODO - Group Transport with the same Position
-func mapToTransports(gtfss []*gtfs.GTFS) []ratpTransport {
+func mapToTransports(gtfss []*gtfs.GTFS) []models.Transport {
 	// Total count of transports
 	var size int
 	for _, g := range gtfss {
 		size += len(g.Stops)
 	}
 	// Create the transports array
-	transports := make([]ratpTransport, size)
-	// For each gtfs, map the stops to a ratpTransport struct
+	transports := make([]models.Transport, size)
+	// For each gtfs, map the stops to a Transport struct
 	// and add them to the transports array
 	// Also update the image path of each transport depending on its Routes
 	var i int
@@ -123,19 +123,17 @@ func mapToTransports(gtfss []*gtfs.GTFS) []ratpTransport {
 		}
 		image := imageForRoute(g.Routes[0])
 		for _, s := range g.Stops {
-			transports[i] = ratpTransport{
-				models.TransportProto{
-					ID:       s.ID,
-					AgencyID: Agency.ID,
-					Name:     s.Name,
-					Type:     g.Routes[0].Type,
-					Line:     g.Routes[0].ShortName,
-					IconURL:  image,
-					Passages: []*models.Passage{},
-					Position: models.Position{
-						Latitude:  s.Latitude,
-						Longitude: s.Longitude,
-					},
+			transports[i] = models.Transport{
+				ID:           s.ID,
+				AgencyID:     Agency.ID,
+				Name:         s.Name,
+				Type:         g.Routes[0].Type,
+				Line:         g.Routes[0].ShortName,
+				IconURL:      image,
+				Informations: []models.Information{},
+				Position: models.Position{
+					Latitude:  s.Latitude,
+					Longitude: s.Longitude,
 				},
 			}
 			i++
