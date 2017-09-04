@@ -1,0 +1,16 @@
+[Unit]
+Description=OpenTransports server for Paris
+After=network.target
+
+[Service]
+Type=simple
+User=opentransports
+WorkingDirectory=/home/admin
+ExecStart=/home/admin/go/bin/Paris
+Restart=on-abort
+
+Environment=PORT=56789
+Environment=SERVER_URL=https://artonge.duckdns.org/opentransports-paris
+
+[Install]
+WantedBy=multi-user.target
