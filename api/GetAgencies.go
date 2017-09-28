@@ -17,15 +17,15 @@ func GetAgencies(ctx context.Context) {
 	// Recover from potential panic in agencies
 	defer func() {
 		if r := recover(); r != nil {
-			ctx.Application().Log(
-				"Panic asking if agencies contains position (%v)\n	==> %v",
+			ctx.Application().Logger().Errorf(
+				"Panic asking if agencies contains position (%v - %v)\n	==> %v",
 				ctx.FormValue("latitude"),
 				ctx.FormValue("longitude"),
 				r,
 			)
 			_, err := ctx.JSON(make([]models.Transport, 0))
 			if err != nil {
-				ctx.Application().Log("Error writting answer in /api/agencies\n	==> %v", err)
+				ctx.Application().Logger().Errorf("Error writting answer in /api/agencies\n	==> %v", err)
 			}
 		}
 	}()
@@ -41,6 +41,6 @@ func GetAgencies(ctx context.Context) {
 	}))
 	// Log the error if any
 	if err != nil {
-		ctx.Application().Log("Error writting answer in /api/agencies\n	==> %v", err)
+		ctx.Application().Logger().Errorf("Error writting answer in /api/agencies\n	==> %v", err)
 	}
 }

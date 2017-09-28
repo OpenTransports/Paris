@@ -8,9 +8,6 @@ import (
 	"github.com/OpenTransports/lib-go/models"
 )
 
-// Transports - List of all transports of the RATP agency
-var Transports []models.Transport
-
 // Agency - Agency object
 var Agency = models.Agency{
 	ID:     "FR.Paris.RATP",
@@ -48,24 +45,4 @@ func UpdateTransportInfo(transport *models.Transport) error {
 		transport.Informations[i].Timestamp = int(time.Now().Unix()) * 1000
 	}
 	return err
-}
-
-// TransportsNearPosition - Find transports contained in a circle
-// @param p: the center of the circle
-// @param radius: the radius of the circle in meters
-// @return the transports list
-func TransportsNearPosition(position models.Position, radius float64) ([]models.Transport, error) {
-	// Init array of filtered transports
-	filteredTransports := make([]models.Transport, 0, 200)
-	// Loop trough agencies transports to find the one that are in the radius limits
-	i := 0
-	for j, t := range Transports {
-		if t.DistanceFrom(position) < radius {
-			filteredTransports = append(filteredTransports, Transports[j])
-			i++
-		}
-	}
-	// Return the transport slice from 0 to i
-	// Indexes after i are just empty spots in the original array
-	return filteredTransports[:i], nil
 }

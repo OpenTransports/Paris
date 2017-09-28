@@ -24,12 +24,13 @@ var tmp = helpers.TmpDir(Agency.ID)
 var media = helpers.MediaDir(Agency.ID)
 
 func init() {
+	// If testing don't do the setup
 	if flag.Lookup("test.v") != nil {
 		return
 	}
 	download(gtfsURL, tmp)
 	unzip()
-	store()
+	load()
 	go download(iconFerreURL, path.Join(media, "ferre"))
 	go download(iconBusURL, path.Join(media, "bus"))
 	go downloadFile(iconLogoRERURL, path.Join(media, "logoRER.png"))
@@ -85,17 +86,17 @@ func unzip() {
 	}
 }
 
-func store() {
+func load() {
 	fmt.Println("Loading RATP...")
 	// Load data
 	gtfss, err := gtfs.LoadSplitted(tmp, map[string]bool{"routes": true, "stops": true})
 	if err != nil {
 		panic(err)
 	}
-	Transports = filterDouble(mapToTransports(gtfss))
+	Agency.Transports = removeDuplicate(mapToTransports(gtfss))
 }
 
-// Remove Downloaded sruff
+// Remove Downloaded stuff
 func clean() {
 	fmt.Println("Cleaning RATP...")
 	err := os.RemoveAll(tmp)
@@ -104,19 +105,24 @@ func clean() {
 	}
 }
 
-func filterDouble(transports []models.Transport) []models.Transport {
+// Ratp data contains duplicates transports, this fontion filter them
+func removeDuplicate(transports []models.Transport) []models.Transport {
+
+	var isDuplicate bool
+	var count int
 	filteredTransports := make([]models.Transport, 0, len(transports))
-	count := 0
-	for i, tran1 := range transports {
-		added := false
-		for _, tran2 := range filteredTransports {
-			if tran1.Line == tran2.Line && tran1.Name == tran2.Name {
-				added = true
+
+	for _, transport := range transports {
+		isDuplicate = false
+		for _, fTransport := range filteredTransports {
+			if transport.Line == fTransport.Line && transport.Name == fTransport.Name {
+				isDuplicate = true
 				break
 			}
 		}
-		if !added {
-			filteredTransports = append(filteredTransports, transports[i])
+
+		if !isDuplicate {
+			filteredTransports = append(filteredTransports, transport)
 			count++
 		}
 	}
@@ -186,5 +192,4 @@ func imageForRoute(r gtfs.Route) string {
 	default:
 		return ""
 	}
-
 }

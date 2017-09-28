@@ -21,10 +21,10 @@ func GetTransports(ctx context.Context) {
 	// Recover from potential panic in agencies
 	defer func() {
 		if r := recover(); r != nil {
-			ctx.Application().Log("Panic asking for nearest transports to agencies\n	==> %v", r)
+			ctx.Application().Logger().Errorf("Panic asking for nearest transports to agencies\n	==> %v", r)
 			_, err := ctx.JSON(make([]models.Transport, 0))
 			if err != nil {
-				ctx.Application().Log("Error writting answer in /api/transports\n	==> %v", err)
+				ctx.Application().Logger().Errorf("Error writting answer in /api/transports\n	==> %v", err)
 			}
 		}
 	}()
@@ -33,7 +33,7 @@ func GetTransports(ctx context.Context) {
 	// Ignore errors because it default to 0
 	latitude, _ := strconv.ParseFloat(ctx.FormValue("latitude"), 64)
 	longitude, _ := strconv.ParseFloat(ctx.FormValue("longitude"), 64)
-	radius, _ := strconv.ParseFloat(ctx.FormValue("radius"), 64)
+	radius, _ := strconv.ParseInt(ctx.FormValue("radius"), 10, 64)
 	// Create a Position object
 	position := models.Position{
 		Latitude:  latitude,
@@ -41,30 +41,26 @@ func GetTransports(ctx context.Context) {
 	}
 	// Set the radius to its default value if none is passed
 	if radius == 0 {
-		radius = 200.0
+		radius = 200
 	}
 	// Create transports array - max size is 300
 	nearestTransports := []models.Transport{}
 	// Get all transports near the passed position
-	// Only aske agencies that cover the passed position
-	for _ = range agencies.Containing(position) {
-		transports, err := ratp.TransportsNearPosition(position, radius)
-		if err != nil {
-			ctx.Application().Log("Error in /api/transports\n	==> %v", err)
-			continue
-		}
+	// Only ask agencies that cover the passed position
+	for _, agency := range agencies.Containing(position) {
+		transports := agency.TransportsNearPosition(position, int(radius))
 		nearestTransports = append(nearestTransports, transports...)
 	}
 	// Get fresh infos for each transports
 	errs := updateInfos(nearestTransports)
 	for _, err := range errs {
-		ctx.Application().Log("Error in /api/transports\n	==> %v", err)
+		ctx.Application().Logger().Errorf("Error in /api/transports\n	==> %v", err)
 	}
 	// Return the result
 	_, err := ctx.JSON(nearestTransports)
 	// Log the error if any
 	if err != nil {
-		ctx.Application().Log("Error writting answer in /api/transports\n	==> %v", err)
+		ctx.Application().Logger().Errorf("Error writting answer in /api/transports\n	==> %v", err)
 	}
 }
 
