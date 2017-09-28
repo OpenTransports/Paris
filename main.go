@@ -5,6 +5,7 @@ import (
 
 	"github.com/OpenTransports/Paris/api"
 	"github.com/go-siris/siris"
+	"github.com/go-siris/siris/context"
 )
 
 func main() {
@@ -14,9 +15,16 @@ func main() {
 	// Serve medias files
 	app.StaticWeb("/medias", "./medias")
 
+	app.Use(func(ctx context.Context) {
+		ctx.Header("Access-Control-Allow-Origin", "*")
+		ctx.Next()
+	})
+
 	// Build api
 	// /api/transports?latitude=...&longitude=...
 	app.Get("/transports", api.GetTransports)
+	app.Get("/transports/{transportID:string}", api.GetTransport)
+	app.Get("/transports/{transportID:string}/route", api.GetTransportRoute)
 	// /api/agencies?latitude=...&longitude=...
 	app.Get("/agencies", api.GetAgencies)
 

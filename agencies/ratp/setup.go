@@ -94,6 +94,8 @@ func load() {
 		panic(err)
 	}
 	Agency.Transports = removeDuplicate(mapToTransports(gtfss))
+	Agency.Routes = mapToRoutes(gtfss, Agency.Transports)
+
 }
 
 // Remove Downloaded stuff
@@ -165,6 +167,32 @@ func mapToTransports(gtfss []*gtfs.GTFS) []models.Transport {
 		}
 	}
 	return transports
+}
+
+// Map gtfs.Route to models.Route and fill models.Route.Stops with approriate transports
+func mapToRoutes(gtfss []*gtfs.GTFS, transports []models.Transport) []models.Route {
+	routes := make([]models.Route, 0, 200)
+
+	for _, gtfs := range gtfss {
+		for _, route := range gtfs.Routes {
+			// Create the new route
+			newRoute := models.Route{
+				Line:  route.ShortName,
+				Color: route.Color,
+				Stops: make([]models.Transport, 0, 50),
+			}
+			// Fill stops with related transports
+			for _, transport := range transports {
+				if transport.Line == newRoute.Line {
+					newRoute.Stops = append(newRoute.Stops, transport)
+				}
+			}
+			// Append the new route to the routes array
+			routes = append(routes, newRoute)
+		}
+	}
+
+	return routes
 }
 
 // Given a route, return the corresponding path to the logo

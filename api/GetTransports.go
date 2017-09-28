@@ -17,7 +17,6 @@ import (
 // @formParam longitude : optional, the longitude around where to search, default is 0
 // @formParam radius : optional, default is 200m
 func GetTransports(ctx context.Context) {
-	ctx.Header("Access-Control-Allow-Origin", "*")
 	// Recover from potential panic in agencies
 	defer func() {
 		if r := recover(); r != nil {
@@ -52,7 +51,7 @@ func GetTransports(ctx context.Context) {
 		nearestTransports = append(nearestTransports, transports...)
 	}
 	// Get fresh infos for each transports
-	errs := updateInfos(nearestTransports)
+	errs := UpdateInfos(nearestTransports)
 	for _, err := range errs {
 		ctx.Application().Logger().Errorf("Error in /api/transports\n	==> %v", err)
 	}
@@ -64,9 +63,10 @@ func GetTransports(ctx context.Context) {
 	}
 }
 
-// Refresh information concerning transports
+// UpdateInfos - Refresh information concerning transports
 // @params transports : the transports list to update
-func updateInfos(transports []models.Transport) []error {
+// @return encontered errors
+func UpdateInfos(transports []models.Transport) []error {
 	if len(transports) == 0 {
 		return nil
 	}

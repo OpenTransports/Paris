@@ -6,7 +6,7 @@ import (
 )
 
 // REGIONS - List of all regions
-var agenciesList = [1]models.Agency{
+var AllAgencies = [1]models.Agency{
 	ratp.Agency,
 }
 
@@ -14,12 +14,12 @@ var agenciesList = [1]models.Agency{
 func Containing(position models.Position) []models.Agency {
 
 	if position.Latitude == 0 || position.Longitude == 0 {
-		return agenciesList[:]
+		return AllAgencies[:]
 	}
 
 	var filter = make([]models.Agency, 0)
 
-	for _, a := range agenciesList {
+	for _, a := range AllAgencies {
 		if a.ContainsPosition(position) {
 			filter = append(filter, a)
 		}
