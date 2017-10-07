@@ -101,8 +101,8 @@ func UpdateInfos(transports []models.Transport) []error {
 				gather <- done
 			case err := <-errC:
 				errors <- err
-			case <-time.After(7 * time.Second):
-				errors <- fmt.Errorf("Time out after 3s\n	==> station: %v", transports[i])
+			case <-time.After(10 * time.Second):
+				errors <- fmt.Errorf("Time out after 10s\n	==> station: %v", transports[i])
 			}
 
 		}(i)

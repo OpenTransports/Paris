@@ -171,20 +171,20 @@ func mapToTransports(gtfss []*gtfs.GTFS) []models.Transport {
 
 // Map gtfs.Route to models.Route and fill models.Route.Stops with approriate transports
 func mapToRoutes(gtfss []*gtfs.GTFS, transports []models.Transport) []models.Route {
-	routes := make([]models.Route, 0, 200)
 
+	routes := make([]models.Route, 0, 200)
 	for _, gtfs := range gtfss {
 		for _, route := range gtfs.Routes {
 			// Create the new route
 			newRoute := models.Route{
-				Line:  route.ShortName,
-				Color: route.Color,
-				Stops: make([]models.Transport, 0, 50),
+				ID:     route.ShortName,
+				Color:  route.Color,
+				Points: make([]models.Position, 0, 50),
 			}
 			// Fill stops with related transports
 			for _, transport := range transports {
-				if transport.Line == newRoute.Line {
-					newRoute.Stops = append(newRoute.Stops, transport)
+				if transport.Line == newRoute.ID {
+					newRoute.Points = append(newRoute.Points, transport.Position)
 				}
 			}
 			// Append the new route to the routes array

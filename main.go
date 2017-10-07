@@ -21,12 +21,11 @@ func main() {
 	})
 
 	// Build api
-	// /api/transports?latitude=...&longitude=...
 	app.Get("/transports", api.GetTransports)
 	app.Get("/transports/{transportID:string}", api.GetTransport)
 	app.Get("/transports/{transportID:string}/route", api.GetTransportRoute)
-	// /api/agencies?latitude=...&longitude=...
 	app.Get("/agencies", api.GetAgencies)
+	app.Get("/routes", api.GetRoutes)
 
 	// Set listening port
 	var port = os.Getenv("PORT")

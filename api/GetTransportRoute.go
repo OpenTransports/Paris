@@ -18,7 +18,7 @@ func GetTransportRoute(ctx context.Context) {
 		_, err := ctx.JSON(route)
 		// Log the error if any
 		if err != nil {
-			ctx.Application().Logger().Errorf("Error writting answer in /api/agencies\n	==> %v", err)
+			ctx.Application().Logger().Errorf("Error writting answer in /api/transports/transportID/route\n	==> %v", err)
 		}
 		break
 	}
